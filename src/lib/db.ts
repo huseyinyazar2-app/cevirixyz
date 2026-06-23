@@ -7,7 +7,8 @@ let db: Database | null = null;
 export async function getDb() {
   if (db) return db;
 
-  const dbPath = path.resolve(process.cwd(), 'local.sqlite');
+  const isProd = process.env.NODE_ENV === 'production';
+  const dbPath = isProd ? '/tmp/local.sqlite' : path.resolve(process.cwd(), 'local.sqlite');
   
   db = await open({
     filename: dbPath,
