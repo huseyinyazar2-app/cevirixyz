@@ -22,9 +22,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
     }
 
-    // Get the other user's language in the room to know target translation
-    const otherUser = await db.get('SELECT language FROM users WHERE room_id = ? AND id != ? LIMIT 1', [roomId, userId]);
-    const targetLanguage = otherUser ? otherUser.language : (user.language === 'tr' ? 'nl' : 'tr');
+    const sourceLang = (formData.get('sourceLang') as string) || user.language;
+    let targetLang = formData.get('targetLang') as string;
+
+    // Resolve targetLang if it is 'auto' or not provided
+    if (!targetLang || targetLang === 'auto') {
+      const otherUser = await db.get('SELECT language FROM users WHERE room_id = ? AND id != ? LIMIT 1', [roomId, userId]);
+      targetLang = otherUser ? otherUser.language : (sourceLang === 'tr' ? 'en' : 'tr');
+    }
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -40,9 +45,9 @@ export async function POST(req: Request) {
     const base64Audio = Buffer.from(arrayBuffer).toString('base64');
     const mimeType = audioBlob.type || 'audio/webm';
 
-    const prompt = `You are a professional interpreter. Listen to this audio spoken in ${user.language}.
+    const prompt = `You are a professional interpreter. Listen to this audio spoken in ${sourceLang}.
 1. Transcribe exactly what is said.
-2. Translate it accurately to ${targetLanguage}.
+2. Translate it accurately to ${targetLang}.
 Return the result STRICTLY as a JSON object with two keys: "original" and "translated". Do not include markdown formatting or backticks.`;
 
     const response = await ai.models.generateContent({
