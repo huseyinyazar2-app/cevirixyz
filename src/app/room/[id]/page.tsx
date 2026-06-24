@@ -233,8 +233,17 @@ export default function RoomPage({ params }: { params: Promise<{ id: string }> }
             return (
               <div key={m.id} className={`chat-bubble ${isMine ? 'mine' : 'other'}`}>
                 {!isMine && <div style={{ fontSize: "0.7rem", opacity: 0.7, marginBottom: "4px" }}>{m.senderName}</div>}
-                <div className="text-original">{m.originalText}</div>
-                <div className="text-translated">{m.translatedText}</div>
+                {isMine ? (
+                  <>
+                    <div className="text-translated">{m.originalText}</div>
+                    <div className="text-original" style={{ marginTop: "4px", marginBottom: 0 }}>{m.translatedText}</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-original">{m.originalText}</div>
+                    <div className="text-translated">{m.translatedText}</div>
+                  </>
+                )}
               </div>
             );
           })
