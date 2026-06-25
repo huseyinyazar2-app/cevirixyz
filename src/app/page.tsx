@@ -12,7 +12,7 @@ export default function Home() {
   const createRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (token !== "test123") {
+    if (token !== "Deneme123") {
       alert("Hatalı token! Oda açma yetkiniz yok.");
       return;
     }

@@ -30,7 +30,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <div className="app-version">v1.0.7</div>
+        <div className="app-version">v1.0.8</div>
         {children}
       </body>
     </html>
